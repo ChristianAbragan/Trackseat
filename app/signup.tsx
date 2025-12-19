@@ -14,7 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { auth, db } from "./firebaseConfig";
+import { auth, db } from "../firebaseConfig";
 
 export default function SignupScreen() {
   const router = useRouter();

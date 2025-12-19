@@ -16,7 +16,7 @@ import {
     View,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import { app } from "./firebaseConfig";
+import { app } from "../firebaseConfig";
 
 const BUS_ICON = require("../assets/Bus1.png"); 
 const LOGO_IMG = require("../assets/TRACKSEAT.png"); 

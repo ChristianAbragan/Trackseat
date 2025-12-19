@@ -12,7 +12,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { auth } from './firebaseConfig';
+import { auth } from '../firebaseConfig';
 
 const LOGO_IMAGE = require("../assets/logo.png"); // Ensure path is correct
 

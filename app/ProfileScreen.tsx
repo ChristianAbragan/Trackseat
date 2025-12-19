@@ -17,7 +17,7 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import { app } from "./firebaseConfig";
+import { app } from "../firebaseConfig";
 
 const auth = getAuth(app);
 const db = getDatabase(app);
