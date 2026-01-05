@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -13,18 +12,19 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ActivityIndicator
 } from "react-native";
 import { auth, db } from "../firebaseConfig";
 
 export default function SignupScreen() {
   const router = useRouter();
-
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [birthdate, setBirthdate] = useState("");
   const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const pickProfilePic = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -39,102 +39,65 @@ export default function SignupScreen() {
   };
 
   const handleSubmit = async () => {
-    if (!fullName || !username || !password || !confirmPassword || !birthdate) {
-      Alert.alert("Missing Fields", "Please fill all required fields.");
+    if (!fullName || !username || !password || !birthdate) {
+      Alert.alert("Missing Fields", "Please fill all fields.");
       return;
     }
     if (password !== confirmPassword) {
-      Alert.alert("Password Error", "Passwords do not match.");
+      Alert.alert("Error", "Passwords do not match.");
       return;
     }
 
-    // calculate age
-    const birth = new Date(birthdate);
-    const today = new Date();
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-      age--;
-    }
-
+    setLoading(true);
     try {
-      const email = `${username}@trackseat.com`;
+      const email = `${username.trim().toLowerCase()}@trackseat.com`;
       const userCred = await createUserWithEmailAndPassword(auth, email, password);
       const uid = userCred.user.uid;
 
-      // Save user data to Realtime Database (Category removed)
+      // Calculate Age
+      const birth = new Date(birthdate);
+      const today = new Date();
+      let calculatedAge = today.getFullYear() - birth.getFullYear();
+      if (today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) {
+        calculatedAge--;
+      }
+
+      // Save to Realtime Database
       await set(ref(db, "users/" + uid), {
         fullName,
         username,
         profileImage: profilePic || "",
         birthdate,
-        age,
+        age: calculatedAge,
         role: "user", 
         status: "checked-out",
         activeInApp: true,
       });
 
-      await AsyncStorage.setItem("user", JSON.stringify({ uid }));
-      await AsyncStorage.setItem("isLoggedIn", "true");
-
-      Alert.alert("Success", "Signup successful!");
-      router.replace("/homepage");
     } catch (err: any) {
-      Alert.alert("Error", "Signup failed: " + err.message);
+      Alert.alert("Error", err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <View style={styles.outerContainer}> 
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        <Image
-          source={require("../assets/logo.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+        <Image source={require("../assets/logo.png")} style={styles.logo} resizeMode="contain" />
 
-        <TextInput
-          style={styles.input}
-          placeholder="FULL NAME"
-          value={fullName}
-          onChangeText={setFullName}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="USERNAME"
-          value={username}
-          onChangeText={setUsername}
-          autoCapitalize="none"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="PASSWORD"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="CONFIRM PASSWORD"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="BIRTHDATE (YYYY-MM-DD)"
-          value={birthdate}
-          onChangeText={setBirthdate}
-        />
+        <TextInput style={styles.input} placeholder="FULL NAME" value={fullName} onChangeText={setFullName} />
+        <TextInput style={styles.input} placeholder="USERNAME" value={username} onChangeText={setUsername} autoCapitalize="none" />
+        <TextInput style={styles.input} placeholder="PASSWORD" value={password} onChangeText={setPassword} secureTextEntry />
+        <TextInput style={styles.input} placeholder="CONFIRM PASSWORD" value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry />
+        <TextInput style={styles.input} placeholder="BIRTHDATE (YYYY-MM-DD)" value={birthdate} onChangeText={setBirthdate} keyboardType="numeric" />
 
         <TouchableOpacity style={styles.uploadButton} onPress={pickProfilePic}>
-          <Text style={styles.uploadText}>
-            {profilePic ? "Profile Picture ✅" : "Upload Profile Picture"}
-          </Text>
+          <Text style={styles.uploadText}>{profilePic ? "Profile Picture ✅" : "Upload Profile Picture"}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>SIGN UP</Text>
+        <TouchableOpacity style={[styles.button, loading && { backgroundColor: '#ccc' }]} onPress={handleSubmit} disabled={loading}>
+          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>SIGN UP</Text>}
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -143,10 +106,10 @@ export default function SignupScreen() {
 
 const styles = StyleSheet.create({
   outerContainer: { flex: 1, backgroundColor: "#fff" },
-  contentContainer: { alignItems: "center", justifyContent: "center", padding: 20, minHeight: '100%' },
-  logo: { width: 120, height: 120, marginBottom: 50 },
+  contentContainer: { alignItems: "center", padding: 20, paddingTop: 60 },
+  logo: { width: 100, height: 100, marginBottom: 30 },
   input: { width: "100%", padding: 12, borderRadius: 20, backgroundColor: "#f5f5f5", marginBottom: 15 },
-  button: { backgroundColor: "#4dc3ff", paddingVertical: 12, paddingHorizontal: 50, borderRadius: 20, marginTop: 10 },
+  button: { backgroundColor: "#4dc3ff", paddingVertical: 12, width: '100%', borderRadius: 20, marginTop: 10, alignItems: 'center' },
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
   uploadButton: { backgroundColor: "#ddd", padding: 12, borderRadius: 10, marginBottom: 15, width: "100%", alignItems: 'center' },
   uploadText: { color: "#333" },

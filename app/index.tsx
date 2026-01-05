@@ -1,44 +1,63 @@
-import { Link, useRouter } from 'expo-router';
-import { getAuth } from "firebase/auth";
-import React, { useEffect } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { onAuthStateChanged } from 'firebase/auth';
+import React, { useEffect, useState } from 'react';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+} from 'react-native';
+import { auth } from '../firebaseConfig';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const auth = getAuth();
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        // If user is already logged in, redirect to homepage
-        router.replace("/homepage");
+        // ✅ AUTO ACCESS
+        router.replace('/homepage');
+      } else {
+        setCheckingAuth(false); // show buttons
       }
-      // If no user, stay on landing page
     });
 
-    return () => unsubscribe(); // clean up listener
+    return unsubscribe;
   }, []);
+
+  // 🔄 Prevent flash on slower phones
+  if (checkingAuth) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      {/* Logo */}
       <Image
         source={require('../assets/logo.png')}
         style={styles.logo}
-        resizeMode="contain"/>
-      
-      {/* Buttons */}
-      <Link href="/signup" asChild>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>SIGN-IN</Text>
-        </TouchableOpacity>
-      </Link>
+        resizeMode="contain"
+      />
 
-      <Link href="/login" asChild>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>LOG-IN</Text>
-        </TouchableOpacity>
-      </Link>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => router.push('/login')}
+      >
+        <Text style={styles.buttonText}>LOG-IN</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => router.push('/signup')}
+      >
+        <Text style={styles.buttonText}>SIGN-UP</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -46,26 +65,25 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    padding: 20,
   },
-  logo: {
-    width: 200,
-    height: 200,
-    marginBottom: 20,
-  },
+  logo: { width: 200, height: 200, marginBottom: 40 },
   button: {
     backgroundColor: '#f5f5f5',
-    paddingVertical: 12,
-    paddingHorizontal: 80,
+    padding: 15,
+    width: '80%',
     borderRadius: 50,
     marginVertical: 10,
+    alignItems: 'center',
     elevation: 2,
   },
-  buttonText: {
-    color: '#000',
-    fontSize: 16,
+  buttonText: { color: '#000', fontSize: 16, fontWeight: '600' },
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

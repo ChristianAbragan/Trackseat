@@ -6,56 +6,76 @@
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "scheme": "trackseat",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "userInterfaceStyle": "light",
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
+      "userInterfaceStyle": "light",
       "infoPlist": {
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "Your location is continuously tracked to show your position to the bus driver while you are actively checked in (on board) the bus.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Your location is tracked to show your position to the driver.",
+        "NSPhotoLibraryUsageDescription": "Allow TrackSeat to access photos for profile picture.",
+        "NSCameraUsageDescription": "Allow TrackSeat to use camera.",
         "UIBackgroundModes": [
           "location"
         ]
       }
     },
     "android": {
+      "jsEngine": "jsc",
+      "googleServicesFile": "./google-services.json",
+      "newArchEnabled": false,
+      "userInterfaceStyle": "light",
+      "versionCode": 28,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logov1.png",
+        "foregroundImage": "./assets/logo.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
+      "package": "com.christian_abragan.trackseat",
+      "packagingOptions": {
+        "pickFirst": [
+          "**/libc++_shared.so",
+          "**/libjsc.so"
+        ],
+        "exclude": [
+          "**/libhermes.so",
+          "META-INF/kotlin-stdlib.kotlin_module",
+          "META-INF/kotlin-stdlib-common.kotlin_module",
+          "META-INF/sdk_release.kotlin_module"
+        ]
+      },
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_BACKGROUND_LOCATION"
-      ],
-      "package": "com.christian_abragan.trackseat"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/logo.png"
+        "ACCESS_BACKGROUND_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "plugins": [
       "expo-router",
       [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "2.0.21"
+          }
+        }
+      ],
+      [
         "expo-splash-screen",
         {
-          "image": "./assets/logo.png",
+          "image": "./assets/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ],
-      "expo-font",
-      "expo-web-browser"
+      ]
     ],
-    "experiments": {
-      "typedRoutes": true
-    },
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "ac9fce61-de72-49c0-a3f4-f85da3623839"
+        "projectId": "aa793141-de13-4d0d-89c5-fbf64aa3cbe3"
       }
     }
   }

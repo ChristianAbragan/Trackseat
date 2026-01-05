@@ -1,8 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Link, useRouter } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import * as React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
     Alert,
     Image,
@@ -10,15 +8,17 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    View
+    View,
+    ActivityIndicator
 } from 'react-native';
 import { auth } from '../firebaseConfig';
 
-const LOGO_IMAGE = require("../assets/logo.png"); // Ensure path is correct
+const LOGO_IMAGE = require("../assets/logo.png");
 
 export default function LoginScreen() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
 
     const handleLogin = async () => {
@@ -27,32 +27,25 @@ export default function LoginScreen() {
             return;
         }
 
+        setLoading(true);
         try {
-            // Firebase uses email for sign-in, so we reconstruct the email
-            const email = `${username}@trackseat.com`; 
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
+            // Reconstruct email and trim whitespace
+            const email = `${username.trim().toLowerCase()}@trackseat.com`; 
+            await signInWithEmailAndPassword(auth, email, password);
 
-            // Save login state and UID
-            await AsyncStorage.setItem("user", JSON.stringify({ uid: user.uid }));
-            await AsyncStorage.setItem("isLoggedIn", "true");
-
-            // Navigate to the home page
-            router.replace('/homepage');
-
+            // Firebase handles persistence automatically. 
+            // We just need to navigate.
         } catch (error: any) {
             console.error("Login failed:", error);
-            Alert.alert("Login Failed", "Invalid username or password. Please try again.");
+            Alert.alert("Login Failed", "Invalid username or password.");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <View style={styles.container}>
-            <Image
-                source={LOGO_IMAGE}
-                style={styles.logo}
-                resizeMode="contain"
-            />
+            <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
 
             <TextInput
                 style={styles.input}
@@ -69,8 +62,12 @@ export default function LoginScreen() {
                 onChangeText={setPassword}
             />
 
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                <Text style={styles.buttonText}>SIGN IN</Text>
+            <TouchableOpacity 
+                style={[styles.button, loading && { backgroundColor: '#ccc' }]} 
+                onPress={handleLogin}
+                disabled={loading}
+            >
+                {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>SIGN IN</Text>}
             </TouchableOpacity>
 
             <View style={styles.footer}>
@@ -86,61 +83,12 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        padding: 20,
-        justifyContent: 'center',
-    },
-    logo: {
-        width: 150,
-        height: 150,
-        marginBottom: 10,
-    },
-    title: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 5,
-    },
-    subtitle: {
-        fontSize: 16,
-        color: '#666',
-        marginBottom: 30,
-    },
-    input: {
-        width: '100%',
-        padding: 15,
-        borderRadius: 25,
-        backgroundColor: '#f5f5f5',
-        marginBottom: 15,
-        fontSize: 16,
-        borderWidth: 1,
-        borderColor: '#eee',
-    },
-    button: {
-        width: '100%',
-        backgroundColor: '#4dc3ff',
-        padding: 15,
-        borderRadius: 25,
-        alignItems: 'center',
-        marginTop: 10,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    footer: {
-        marginTop: 30,
-    },
-    footerText: {
-        fontSize: 14,
-        color: '#666',
-    },
-    linkText: {
-        color: '#4dc3ff',
-        fontWeight: 'bold',
-    }
+    container: { flex: 1, backgroundColor: '#fff', alignItems: 'center', padding: 20, justifyContent: 'center' },
+    logo: { width: 150, height: 150, marginBottom: 20 },
+    input: { width: '100%', padding: 15, borderRadius: 25, backgroundColor: '#f5f5f5', marginBottom: 15, fontSize: 16 },
+    button: { width: '100%', backgroundColor: '#4dc3ff', padding: 15, borderRadius: 25, alignItems: 'center', marginTop: 10 },
+    buttonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+    footer: { marginTop: 30 },
+    footerText: { fontSize: 14, color: '#666' },
+    linkText: { color: '#4dc3ff', fontWeight: 'bold' }
 });
