@@ -26,6 +26,7 @@
       "newArchEnabled": false,
       "userInterfaceStyle": "light",
       "versionCode": 28,
+      "enableBundleCompression": false,
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo.png",
         "backgroundColor": "#ffffff"
