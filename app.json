@@ -1,13 +1,14 @@
 {
   "expo": {
     "name": "TrackSeat",
+    "jsEngine": "hermes",
     "slug": "trackseat",
     "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "./assets/logo.png",
+    "icon": "./assets/applogo.png",
     "scheme": "trackseat",
     "userInterfaceStyle": "light",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "userInterfaceStyle": "light",
@@ -15,35 +16,20 @@
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Your location is tracked to show your position to the driver.",
         "NSPhotoLibraryUsageDescription": "Allow TrackSeat to access photos for profile picture.",
         "NSCameraUsageDescription": "Allow TrackSeat to use camera.",
-        "UIBackgroundModes": [
-          "location"
-        ]
+        "UIBackgroundModes": ["location"]
       }
     },
     "android": {
-      "jsEngine": "jsc",
+      "jsEngine": "hermes",
       "googleServicesFile": "./google-services.json",
-      "newArchEnabled": false,
+      "newArchEnabled": true,
       "userInterfaceStyle": "light",
-      "versionCode": 28,
-      "enableBundleCompression": false,
+      "versionCode": 30,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logo.png",
+        "foregroundImage": "./assets/applogo.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.christian_abragan.trackseat",
-      "packagingOptions": {
-        "pickFirst": [
-          "**/libc++_shared.so",
-          "**/libjsc.so"
-        ],
-        "exclude": [
-          "**/libhermes.so",
-          "META-INF/kotlin-stdlib.kotlin_module",
-          "META-INF/kotlin-stdlib-common.kotlin_module",
-          "META-INF/sdk_release.kotlin_module"
-        ]
-      },
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
@@ -59,14 +45,19 @@
         "expo-build-properties",
         {
           "android": {
-            "kotlinVersion": "2.0.21"
+            "kotlinVersion": "2.0.21",
+            "composeCompilerVersion": "2.0.21",
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 34,
+            "minSdkVersion": 24,
+            "buildToolsVersion": "35.0.0"
           }
         }
       ],
       [
         "expo-splash-screen",
         {
-          "image": "./assets/splash-icon.png",
+          "image": "./assets/logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"

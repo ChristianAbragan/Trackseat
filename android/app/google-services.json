@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "759687208177",
+    "firebase_url": "https://trackseat-bd7c5-default-rtdb.firebaseio.com",
+    "project_id": "trackseat-bd7c5",
+    "storage_bucket": "trackseat-bd7c5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:759687208177:android:bcd33c71ef74f6becddd50",
+        "android_client_info": {
+          "package_name": "com.christian_abragan.trackseat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDt-9VClGYaooVBMuhRCRiMu3FqFkzKw70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

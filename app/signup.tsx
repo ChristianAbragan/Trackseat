@@ -74,6 +74,7 @@ export default function SignupScreen() {
         activeInApp: true,
       });
 
+      
     } catch (err: any) {
       Alert.alert("Error", err.message);
     } finally {
